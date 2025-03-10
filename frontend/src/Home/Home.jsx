@@ -29,8 +29,8 @@ export default function Home() {
     // API call with search query if it exists
     const fetchUsers = () => {
       const url = search
-        ? `http://localhost:4000/api/medicine?username=${search}`  // API with search query
-        : "http://localhost:4000/api/medicine";  // Default API without search query
+        ? `https://medicine-reminder-58z9.onrender.com/api/medicine?username=${search}`  // API with search query
+        : "https://medicine-reminder-58z9.onrender.com/api/medicine";  // Default API without search query
 
       axios.get(url)
         .then((res) => {
@@ -94,7 +94,7 @@ export default function Home() {
       setUpdateModal(false);
 
       await axios.post(
-        `http://localhost:4000/api/add/${selectedUser._id}`,
+        `https://medicine-reminder-58z9.onrender.com/api/add/${selectedUser._id}`,
         medicineDetails,
         { headers: { Authorization: `Bearer ${token}` } }
       )
@@ -127,7 +127,7 @@ export default function Home() {
       setUpdateModal(false);
 
       await axios.put(
-        `http://localhost:4000/api/add/update/${selectedUser._id}`,
+        `https://medicine-reminder-58z9.onrender.com/api/add/update/${selectedUser._id}`,
         medicineDetails,
         { headers: { Authorization: `Bearer ${token}` } }
       )

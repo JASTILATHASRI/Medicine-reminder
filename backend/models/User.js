@@ -27,6 +27,10 @@ const userSchema = new mongoose.Schema({
       days: {
         type: [String], 
         required: true
+      },
+      reminderTime: { 
+        type: String, 
+        required: true
       }
     }
   ],

@@ -7,7 +7,7 @@ export default function Login() {
     const navigate = useNavigate()
     function handleLogin(e) {
         e.preventDefault()
-        axios.post("https://medicine-reminder-58z9.onrender.com/api/auth/login",{email,password})
+        axios.post("http://localhost:4000/api/auth/login",{email,password})
         .then((res)=>{
             if(res.status === 200){
                 localStorage.setItem("token",res.data.token)

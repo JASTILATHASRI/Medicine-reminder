@@ -8,7 +8,8 @@ export default function Home() {
   const [selectedUser, setSelectedUser] = useState(null);
   const [medicineName, setMedicineName] = useState('');
   const [dosage, setDosage] = useState('');
-  const [days, setDays] = useState([]);
+  const [days, setDays] = useState([]); 
+  const [reminderTime, setReminderTime] = useState(''); // State for reminder time
   const [showModal, setShowModal] = useState(false);
   const [updateModal, setUpdateModal] = useState(false);
   const [search, setSearch] = useState('');  // State for search input
@@ -26,12 +27,10 @@ export default function Home() {
   ];
 
   useEffect(() => {
-    // API call with search query if it exists
     const fetchUsers = () => {
       const url = search
-        ? `https://medicine-reminder-58z9.onrender.com/api/medicine?username=${search}`  // API with search query
-        : "https://medicine-reminder-58z9.onrender.com/api/medicine";  // Default API without search query
-
+        ? `http://localhost:4000/api/medicine?username=${search}`
+        : "http://localhost:4000/api/medicine";
       axios.get(url)
         .then((res) => {
           setUsers(res.data);
@@ -44,7 +43,7 @@ export default function Home() {
     };
 
     fetchUsers();
-  }, [search]);  // Re-run the effect whenever `search` changes
+  }, [search]);
 
   const handleAddMedicine = (user) => {
     if (!isLoggedIn) {
@@ -61,7 +60,9 @@ export default function Home() {
     setMedicineName('');
     setDosage('');
     setDays(daysOfWeek.map(day => ({ ...day, checked: false })));
+    setReminderTime(''); // Reset reminder time
     setShowModal(true);
+    setUpdateModal(false); // Ensure the update modal is not shown
   };
 
   const handleUpdateMedicine = (user) => {
@@ -77,6 +78,7 @@ export default function Home() {
 
     setSelectedUser(user);
     setUpdateModal(true);
+    setShowModal(false); // Corrected the typo here
   };
 
   const handleSubmitMedicine = async () => {
@@ -85,30 +87,31 @@ export default function Home() {
       return;
     }
 
+    // Collect the days that are checked
     const selectedDays = days.filter(day => day.checked).map(day => day.name);
-    const medicineDetails = { medicineName, dosage, days: selectedDays };
+
+    // Create the medicine details object
+    const medicineDetails = {
+      medicineName,
+      dosage,
+      days: selectedDays,
+      reminderTime
+    };
+
     const token = localStorage.getItem("token");
 
     try {
-      setShowModal(false);
-      setUpdateModal(false);
-
+      // Sending the POST request with the medicineDetails object
       await axios.post(
-        `https://medicine-reminder-58z9.onrender.com/api/add/${selectedUser._id}`,
+        `http://localhost:4000/api/add/${selectedUser._id}`,
         medicineDetails,
         { headers: { Authorization: `Bearer ${token}` } }
-      )
-        .then((res) => {
-          alert("Medicine details added successfully");
-        })
-        .catch((e) => {
-          alert("Medicine already exists");
-        });
-
+      );
+      alert("Medicine details added successfully");
       setShowModal(false);
     } catch (error) {
-      console.error("Error updating medicine details", error);
-      alert("Failed to update medicine details. Try again!");
+      console.error("Error adding medicine details", error);
+      alert("Failed to add medicine details. Try again!");
     }
   };
 
@@ -119,26 +122,17 @@ export default function Home() {
     }
 
     const selectedDays = days.filter(day => day.checked).map(day => day.name);
-    const medicineDetails = { medicineName, dosage, days: selectedDays };
+    const medicineDetails = { medicineName, dosage, days: selectedDays, reminderTime };
     const token = localStorage.getItem("token");
 
     try {
-      setShowModal(false);
-      setUpdateModal(false);
-
       await axios.put(
-        `https://medicine-reminder-58z9.onrender.com/api/add/update/${selectedUser._id}`,
+        `http://localhost:4000/api/add/update/${selectedUser._id}`,
         medicineDetails,
         { headers: { Authorization: `Bearer ${token}` } }
-      )
-        .then((res) => {
-          alert("Medicine details updated successfully");
-        })
-        .catch((e) => {
-          alert("Medicine not found");
-        });
-
-      setShowModal(false);
+      );
+      alert("Medicine details updated successfully");
+      setUpdateModal(false);
     } catch (error) {
       console.error("Error updating medicine details", error);
       alert("Failed to update medicine details. Try again!");
@@ -146,12 +140,16 @@ export default function Home() {
   };
 
   const handleSearchChange = (e) => {
-    setSearch(e.target.value);  // Update the search state with input
+    setSearch(e.target.value);
+  };
+
+  const closeModal = () => {
+    setShowModal(false);
+    setUpdateModal(false);
   };
 
   return (
     <div className="container mt-5">
-
       {/* Search bar */}
       <div className="mb-4">
         <input
@@ -191,8 +189,8 @@ export default function Home() {
           <div className="modal-dialog">
             <div className="modal-content">
               <div className="modal-header">
-                <h1 className="modal-title fs-5">Fill Medicine Details</h1>
-                <button type="button" className="btn-close" onClick={() => { setShowModal(false); setUpdateModal(false); }}></button>
+                <h1 className="modal-title fs-5">{updateModal ? "Update Medicine Details" : "Fill Medicine Details"}</h1>
+                <button type="button" className="btn-close" onClick={closeModal}></button>
               </div>
               <div className="modal-body">
                 <form>
@@ -237,16 +235,27 @@ export default function Home() {
                       ))}
                     </div>
                   </div>
+
+                  {/* Reminder Time: Select specific time */}
+                  <div className="mb-3">
+                    <label className="col-form-label">Reminder Time:</label>
+                    <input
+                      type="time"
+                      className="form-control"
+                      value={reminderTime}
+                      onChange={(e) => setReminderTime(e.target.value)}
+                    />
+                  </div>
                 </form>
               </div>
               <div className="modal-footer">
-                <button type="button" className="btn btn-secondary" onClick={() => { setShowModal(false); setUpdateModal(false); }}>Close</button>
+                <button type="button" className="btn btn-secondary" onClick={closeModal}>Close</button>
                 <button
                   type="button"
                   className="btn btn-success"
-                  onClick={showModal ? handleSubmitMedicine : handleSubmitUpdate}
+                  onClick={updateModal ? handleSubmitUpdate : handleSubmitMedicine}
                 >
-                  Submit
+                  {updateModal ? "Update" : "Submit"}
                 </button>
               </div>
             </div>

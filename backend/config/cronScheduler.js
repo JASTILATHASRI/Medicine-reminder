@@ -13,6 +13,8 @@ const scheduleReminderJobs = async () => {
           const cronExpression = `${minute} ${hour} * * *`; 
 
           console.log(`Scheduling cron job for ${user.username} to take ${medicine.medicineName} at ${medicine.reminderTime}`);
+          console.log(cronExpression)
+          
           cron.schedule(cronExpression, async () => {
             console.log(`Cron job triggered: Sending reminder for ${user.username} for medicine ${medicine.medicineName} at ${medicine.reminderTime}...`);
             

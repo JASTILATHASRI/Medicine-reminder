@@ -30,7 +30,7 @@ export default function Register() {
       const newPatient = { username, email, password, medicineName, dosage, days };
 
       // Post the new user with medicine details to the backend
-      axios.post("http://localhost:4000/api/auth/register", newPatient)
+      axios.post("https://medicine-reminder-58z9.onrender.com/api/auth/register", newPatient)
         .then((res) => {
           if (res.status === 201) {
             alert("User created successfully! Please log in.");

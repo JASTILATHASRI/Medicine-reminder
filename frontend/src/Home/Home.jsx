@@ -29,8 +29,8 @@ export default function Home() {
   useEffect(() => {
     const fetchUsers = () => {
       const url = search
-        ? `http://localhost:4000/api/medicine?username=${search}`
-        : "http://localhost:4000/api/medicine";
+        ? `https://medicine-reminder-58z9.onrender.com/api/medicine?username=${search}`
+        : "https://medicine-reminder-58z9.onrender.com/api/medicine";
       axios.get(url)
         .then((res) => {
           setUsers(res.data);
@@ -103,7 +103,7 @@ export default function Home() {
     try {
       // Sending the POST request with the medicineDetails object
       await axios.post(
-        `http://localhost:4000/api/add/${selectedUser._id}`,
+        `https://medicine-reminder-58z9.onrender.com/api/add/${selectedUser._id}`,
         medicineDetails,
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -127,7 +127,7 @@ export default function Home() {
 
     try {
       await axios.put(
-        `http://localhost:4000/api/add/update/${selectedUser._id}`,
+        `https://medicine-reminder-58z9.onrender.com/api/add/update/${selectedUser._id}`,
         medicineDetails,
         { headers: { Authorization: `Bearer ${token}` } }
       );

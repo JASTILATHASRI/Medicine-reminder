@@ -3,7 +3,6 @@ const express = require("express");
 const router = express.Router();
 const User = require("../models/User");
 const authMiddleware = require("../middleware/authMiddleware");
-const { scheduleReminderJobs } = require('../config/cronScheduler');  // Import from config/cronScheduler
 
 // POST route to add new medicine with reminder time
 router.post("/:userId", authMiddleware, async (req, res) => {
@@ -28,8 +27,6 @@ router.post("/:userId", authMiddleware, async (req, res) => {
 
         res.status(200).json({ message: "Medicine details added successfully" });
 
-        // Call scheduleReminderJobs to update the cron jobs after adding the new medicine
-        await scheduleReminderJobs();  // Ensure the cron jobs are updated with new reminder times
     } catch (err) {
         console.error(err);
         res.status(500).json({ message: "Internal server error" });
@@ -65,7 +62,6 @@ router.put("/update/:userId", authMiddleware, async (req, res) => {
 
         // Reschedule cron jobs whenever medicine details are updated
         console.log(`Reminder time updated for ${user.username}. Rescheduling cron jobs...`);
-        await scheduleReminderJobs(); // Ensure the cron job is updated with the new reminder times
 
         return res.status(200).json({ message: "Medicine details updated successfully" });
     } catch (err) {
